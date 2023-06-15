@@ -1,35 +1,36 @@
 from flask import Flask, render_template, request
 import pymysql
 import time
-import board
-import busio
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.analog_in import AnalogIn
+import subprocess
 
 app = Flask(__name__)
 
 # Database configuration
 host = 'localhost'
-user = 'admin'
-password = 'pi'
-database = 'data'
+user = 'your_username'
+password = 'your_password'
+database = 'your_database_name'
 
 # Connect to the MariaDB database
 conn = pymysql.connect(host=host, user=user, password=password, database=database)
 cursor = conn.cursor()
 
-# Create the I2C bus
-i2c = busio.I2C(board.SCL, board.SDA)
+# Create the plant_data table if it doesn't exist
+create_table_query = '''
+    CREATE TABLE IF NOT EXISTS plant_data (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        moisture_level DECIMAL(10, 2),
+        watering_count INT DEFAULT 0
+    );
+'''
+cursor.execute(create_table_query)
+conn.commit()
 
-# Create the ADC object
-ads = ADS.ADS1115(i2c)
-
-# Define the analog input channel
-chan = AnalogIn(ads, ADS.P0)
-
-# Function to read moisture level
+# Function to read moisture level from the sensor
 def read_moisture_level():
-    return chan.value
+    moisture_level = subprocess.check_output("./a.out")
+    return float(moisture_level)
 
 @app.route('/')
 def index():
@@ -38,7 +39,7 @@ def index():
     cursor.execute(select_query)
     rows = cursor.fetchall()
 
-    # Read moisture level
+    # Read moisture level from the sensor
     moisture_level = read_moisture_level()
 
     # Render the template with the retrieved data and moisture level
@@ -57,4 +58,4 @@ def insert():
     return 'Data inserted successfully.'
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True)

@@ -5,24 +5,26 @@
     <style>
         table {
             border-collapse: collapse;
-            width: 100%;
         }
 
         th, td {
-            text-align: left;
             padding: 8px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
     <h1>Plant Data</h1>
     <h2>Moisture Level: {{ moisture_level }}</h2>
-
-    <h3>Plant Records</h3>
+    <form action="/insert" method="POST">
+        <label for="moisture_level">Moisture Level:</label>
+        <input type="text" id="moisture_level" name="moisture_level">
+        <label for="watering_count">Watering Count:</label>
+        <input type="text" id="watering_count" name="watering_count">
+        <button type="submit">Insert Data</button>
+    </form>
+    <br>
     <table>
         <tr>
             <th>ID</th>
@@ -39,16 +41,5 @@
         </tr>
         {% endfor %}
     </table>
-
-    <h3>Add New Plant Data</h3>
-    <form action="/insert" method="post">
-        <label for="moisture_level">Moisture Level:</label>
-        <input type="text" id="moisture_level" name="moisture_level" required><br>
-
-        <label for="watering_count">Watering Count:</label>
-        <input type="text" id="watering_count" name="watering_count" required><br>
-
-        <input type="submit" value="Add Data">
-    </form>
 </body>
 </html>
