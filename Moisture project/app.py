@@ -1,17 +1,35 @@
 from flask import Flask, render_template, request
 import pymysql
+import time
+import board
+import busio
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
 
 app = Flask(__name__)
 
 # Database configuration
 host = 'localhost'
-user = 'root'
+user = 'admin'
 password = 'pi'
 database = 'data'
 
 # Connect to the MariaDB database
 conn = pymysql.connect(host=host, user=user, password=password, database=database)
 cursor = conn.cursor()
+
+# Create the I2C bus
+i2c = busio.I2C(board.SCL, board.SDA)
+
+# Create the ADC object
+ads = ADS.ADS1115(i2c)
+
+# Define the analog input channel
+chan = AnalogIn(ads, ADS.P0)
+
+# Function to read moisture level
+def read_moisture_level():
+    return chan.value
 
 @app.route('/')
 def index():
@@ -20,8 +38,11 @@ def index():
     cursor.execute(select_query)
     rows = cursor.fetchall()
 
-    # Render the template with the retrieved data
-    return render_template('index.html', rows=rows)
+    # Read moisture level
+    moisture_level = read_moisture_level()
+
+    # Render the template with the retrieved data and moisture level
+    return render_template('index.html', rows=rows, moisture_level=moisture_level)
 
 @app.route('/insert', methods=['POST'])
 def insert():
@@ -36,4 +57,4 @@ def insert():
     return 'Data inserted successfully.'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
