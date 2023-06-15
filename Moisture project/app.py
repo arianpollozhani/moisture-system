@@ -5,9 +5,9 @@ app = Flask(__name__)
 
 # Database configuration
 host = 'localhost'
-user = 'your_username'
-password = 'your_password'
-database = 'your_database_name'
+user = 'root'
+password = 'pi'
+database = 'data'
 
 # Connect to the MariaDB database
 conn = pymysql.connect(host=host, user=user, password=password, database=database)
