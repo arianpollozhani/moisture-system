@@ -7,25 +7,14 @@ app = Flask(__name__)
 
 # Database configuration
 host = 'localhost'
-user = 'your_username'
-password = 'your_password'
-database = 'your_database_name'
+user = 'admin'
+password = 'pi'
+database = 'data'
 
 # Connect to the MariaDB database
 conn = pymysql.connect(host=host, user=user, password=password, database=database)
 cursor = conn.cursor()
 
-# Create the plant_data table if it doesn't exist
-create_table_query = '''
-    CREATE TABLE IF NOT EXISTS plant_data (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        moisture_level DECIMAL(10, 2),
-        watering_count INT DEFAULT 0
-    );
-'''
-cursor.execute(create_table_query)
-conn.commit()
 
 # Function to read moisture level from the sensor
 def read_moisture_level():
@@ -58,4 +47,4 @@ def insert():
     return 'Data inserted successfully.'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
